@@ -14,6 +14,7 @@ locals {
   listener_name                  = "${azurerm_virtual_network.example.name}-httplstn"
   request_routing_rule_name      = "${azurerm_virtual_network.example.name}-rqrt"
   redirect_configuration_name    = "${azurerm_virtual_network.example.name}-rdrcfg"
+  ssl_cert = "ssl_cert"
 }
 
 resource "azurerm_application_gateway" "network" {
@@ -44,7 +45,7 @@ resource "azurerm_application_gateway" "network" {
 
   backend_address_pool {
     name = local.backend_address_pool_name
-    ip_addresses = azurerm_linux_virtual_machine.example.public_ip_addresses
+    ip_addresses = azurerm_linux_virtual_machine.example[*].private_ip_address
 
   }
 
@@ -62,6 +63,14 @@ resource "azurerm_application_gateway" "network" {
     frontend_ip_configuration_name = local.frontend_ip_configuration_name
     frontend_port_name             = local.frontend_port_name
     protocol                       = "Https"
+    host_name = "demo.daxko.com"
+    ssl_certificate_name = local.ssl_cert
+  }
+
+  ssl_certificate {
+    name = local.ssl_cert
+    data = filebase64("path/to/file") 
+    password = var.password
   }
 
   request_routing_rule {

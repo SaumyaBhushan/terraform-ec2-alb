@@ -30,8 +30,8 @@ resource "azurerm_network_interface" "example" {
 }
 
 resource "azurerm_linux_virtual_machine" "example" {
-  for_each = var.virtual_machine
-  name                = each.value
+  count = length(var.virtual_machine)
+  name                = var.virtual_machine[count.index]
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
   size                = "Standard_F2"
@@ -42,7 +42,7 @@ resource "azurerm_linux_virtual_machine" "example" {
 
   admin_ssh_key {
     username   = "adminuser"
-    public_key = file("~/.ssh/id_rsa.pub")
+    public_key = file("path/to/file")
   }
 
   os_disk {
